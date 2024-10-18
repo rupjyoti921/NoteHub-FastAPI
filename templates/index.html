@@ -21,7 +21,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <h1 style="text-align: center; margin-top: 10px; margin-bottom: 50px">Note Hub! Create Read Update Delete API Implementation!!</h1>
+          <h1 style="text-align: center; margin-top: 10px; margin-bottom: 50px">Notes Hub! Create Read Update Delete API Implementation!!</h1>
         </div>
       </div>
       <div class="row">
@@ -66,9 +66,9 @@
                 {% endfor %} {% else %} No Notes available <br />Add Notes Please!! {% endif %}
               </div>
             </div>
-            <div class="col-md-7">
-              <h4>Note Description</h4>
-              <hr />
+            <div class="col-md-7 scrollable-list">
+              <h4 id="note_desc_heading">Note Description</h4>
+              <hr id="hr_rmv1"/>
               <div class="tab-content" id="nav-tabContent">
                 <p id="isImp_status" style="background-color: yellow; border-radius: 30px; text-align: center; width: 50%">{% if noteColl|length > 0 %} {{noteColl[0].isImp}} {% else %} No Status available. {% endif %}</p>
                 <p id="desc_content" style="text-align: justify">
@@ -77,9 +77,9 @@
                   {% else %} No description available. {% endif %}
                 </p>
               </div>
-              <hr />
-              <div>
-                <h4>Edit Section..!!</h4>
+              <hr id="hr_rmv2"/>
+              <div id="edit_form" style="display: none;">
+                <h4>Edit Notes</h4>
                 <form method="post" action="/update">
                   <input type="hidden" name="edit_id" id="edit_id" />
                   <div class="form-group">
@@ -112,8 +112,15 @@
         function readDesc(element) {
             const notes = {{ noteColl | tojson | safe
         }};
-        const noteId = element.getAttribute('data-note-id');
 
+        document.getElementById("desc_content").style.display ="block";
+        document.getElementById("isImp_status").style.display = "block";
+        document.getElementById("note_desc_heading").style.display = "block";
+        document.getElementById("hr_rmv1").style.display = "block";
+        document.getElementById("hr_rmv2").style.display = "block";
+        document.getElementById("edit_form").style.display = "none";
+
+        const noteId = element.getAttribute('data-note-id');
         // Find the corresponding note object from the notes array
         const note = notes.find(n => n.id === noteId);
         if (note) {
@@ -146,6 +153,15 @@
         function editNote(noteId){
             const notes = {{ noteColl | tojson | safe
             }};
+
+            document.getElementById("desc_content").style.display = "none";
+            document.getElementById("isImp_status").style.display = "none";
+            document.getElementById("note_desc_heading").style.display = "none";
+            document.getElementById("hr_rmv1").style.display = "none";
+            document.getElementById("hr_rmv2").style.display = "none";
+            document.getElementById("edit_form").style.display = "block";
+            
+            
 
             const edit_id = document.getElementById('edit_id');
             const edit_title = document.getElementById('edit_title');
