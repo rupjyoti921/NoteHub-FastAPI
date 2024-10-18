@@ -3,60 +3,45 @@
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-
-    <!-- Bootstrap CSS -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
-      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-      crossorigin="anonymous"
-    />
-    <script>
-      // Pass the notes from Python to JavaScript safely
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
     <title>NoteHub!</title>
+    <style>
+      /* Custom CSS to make the list scrollable */
+      .scrollable-list {
+        max-height: 500px;
+        /* Adjust the height as needed */
+        overflow-y: auto;
+        /* Enables vertical scrolling */
+      }
+    </style>
   </head>
+
   <body>
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <h1 style="text-align: center; margin-top: 10px; margin-bottom: 50px">
-            Note Hub! Create Read Update Delete
-          </h1>
+          <h1 style="text-align: center; margin-top: 10px; margin-bottom: 50px">Note Hub! Create Read Update Delete API Implementation!!</h1>
         </div>
       </div>
       <div class="row">
         <div class="col-md-4">
           <h2>Create Your Notes!</h2>
           <hr />
-          <form method="post" action="">
+          <form method="post" action="/create">
             <div class="form-group">
               <label for="noteTitle">Note Title</label>
-              <input
-                type="text"
-                class="form-control"
-                id="noteTitle"
-                placeholder="Enter Note Title"
-              />
+              <input type="text" class="form-control" name="title" id="title" placeholder="Enter Note Title" required />
               <small id="" class="form-text text-muted">Keep Title Short</small>
             </div>
             <div class="form-group">
               <label for="noteDesc">Note Description</label>
-              <textarea
-                type="text"
-                class="form-control"
-                id="noteDesc"
-                placeholder="Enter Description"
-              ></textarea>
+              <textarea type="text" class="form-control" name="desc" id="desc" placeholder="Enter Description" required></textarea>
             </div>
             <div class="form-group">
-              <label for="imp">Important ??</label>
-              <select id="imp" class="form-control">
-                <option selected>Choose...</option>
+              <label for="isImp">Important ??</label>
+              <select id="isImp" name="isImp" class="form-control" required>
+                <option disabled selected>Choose...</option>
                 <option value="Important">Important</option>
                 <option value="Not Important">Not Important</option>
               </select>
@@ -66,51 +51,56 @@
         </div>
         <div class="col-md-8">
           <div class="row">
-            <div class="col-5">
-              <h4>Titles</h4>
+            <div class="col-md-5 scrollable-list">
+              <h4>Note Titles</h4>
               <hr />
               <div class="list-group" id="list-tab" role="tablist">
-                {% for note in noteColl %}
-                <a
-                  class="list-group-item list-group-item-action {% if loop.index==1 %}active {% endif %}"
-                  data-note-id="{{ note.id }}"
-                  data-toggle="list"
-                  role="tab"
-                  aria-controls="home"
-                  onclick="readDesc(this)"
-                  >{{note.title}}</a
-                >
-                <button
-                  class="btn btn-danger btn-sm" style="width: 50%; float: right;" 
-                  onclick="deleteNote('{{ note.id }}')"
-                >
-                  Delete
-                </button>
+                {% if noteColl|length > 0 %} {% for note in noteColl %}
+                <a class="list-group-item list-group-item-action {% if loop.index==1 %}active {% endif %}" data-note-id="{{ note.id }}" data-toggle="list" role="tab" aria-controls="home" onclick="readDesc(this)">{{note.title}}</a>
+                <div class="btn-group" role="group" aria-label="Basic example">
+                  <button class="btn btn-danger btn-sm" onclick="deleteNote('{{ note.id }}')">Delete</button>
+                  <button class="btn btn-success btn-sm" onclick="editNote('{{ note.id }}')">Edit</button>
+                </div>
+
                 <hr />
-                {% endfor %}
+                {% endfor %} {% else %} No Notes available <br />Add Notes Please!! {% endif %}
               </div>
             </div>
-            <div class="col-7">
-              <h4>Description</h4>
+            <div class="col-md-7">
+              <h4>Note Description</h4>
               <hr />
               <div class="tab-content" id="nav-tabContent">
-                <p
-                  id="isImp"
-                  style="
-                    background-color: yellow;
-                    border-radius: 30px;
-                    text-align: center;
-                    width: 50%;
-                  "
-                >
-                  {% if noteColl|length > 0 %} {{noteColl[0].isImp}} {% else %}
-                  No description available. {% endif %}
-                </p>
-                <p id="desc_content" style="text-align: justify;">
+                <p id="isImp_status" style="background-color: yellow; border-radius: 30px; text-align: center; width: 50%">{% if noteColl|length > 0 %} {{noteColl[0].isImp}} {% else %} No Status available. {% endif %}</p>
+                <p id="desc_content" style="text-align: justify">
                   {% if noteColl|length > 0 %} {{ noteColl[0].desc }}
                   <!-- Default to the first note's description -->
                   {% else %} No description available. {% endif %}
                 </p>
+              </div>
+              <hr />
+              <div>
+                <h4>Edit Section..!!</h4>
+                <form method="post" action="/update">
+                  <input type="hidden" name="edit_id" id="edit_id" />
+                  <div class="form-group">
+                    <label for="noteTitle">Edit Note Title</label>
+                    <input type="text" class="form-control" name="edit_title" id="edit_title" placeholder="Enter Note Title" required />
+                    <small id="" class="form-text text-muted">Keep Title Short</small>
+                  </div>
+                  <div class="form-group">
+                    <label for="noteDesc">Edit Note Description</label>
+                    <textarea type="text" class="form-control" name="edit_desc" id="edit_desc" placeholder="Enter Description" required></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label for="isImp">Edit Important Status</label>
+                    <select id="edit_isImp" name="edit_isImp" class="form-control" required>
+                      <option disabled selected>Choose...</option>
+                      <option value="Important">Important</option>
+                      <option value="Not Important">Not Important</option>
+                    </select>
+                  </div>
+                  <button style="float: right" type="submit" class="btn btn-success">Update</button>
+                </form>
               </div>
             </div>
           </div>
@@ -119,58 +109,63 @@
     </div>
 
     <script>
-    function readDesc(element) {
-        const notes = {{ noteColl | tojson | safe }};
+        function readDesc(element) {
+            const notes = {{ noteColl | tojson | safe
+        }};
         const noteId = element.getAttribute('data-note-id');
-    
+
         // Find the corresponding note object from the notes array
         const note = notes.find(n => n.id === noteId);
         if (note) {
             // Change the paragraph content to the description of the selected note
             const paragraph = document.getElementById('desc_content');
             paragraph.innerText = note.desc; // Set the paragraph text to the note's description
-            const impStatus=document.getElementById('isImp');
-            impStatus.innerText =note.isImp;
+            const impStatus = document.getElementById('isImp_status');
+            impStatus.innerText = note.isImp;
+            }
         }
-    }
-    
-    function deleteNote(id) {
+
+        function deleteNote(id) {
             // Make a DELETE request to the backend
             fetch(`/delete/${id}`, { method: "DELETE" })
-    
+
                 .then(response => {
                     if (response.ok) {
-                        // // Optionally remove the note from the UI
-                        // document.querySelector(`[data-note-id='${id}']`).remove();
-                        // const noteContent = document.getElementById(id);
-                        // if (noteContent) {
-                        //     noteContent.remove();
-                        // }
                         alert('Note deleted successfully.');
+                        window.location.reload();
                     } else {
                         alert('Failed to delete note.');
+                        window.location.reload();
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
         }
-    
+
+        function editNote(noteId){
+            const notes = {{ noteColl | tojson | safe
+            }};
+
+            const edit_id = document.getElementById('edit_id');
+            const edit_title = document.getElementById('edit_title');
+            const edit_desc = document.getElementById('edit_desc');
+            const edit_isImp = document.getElementById('edit_isImp');
+
+
+            const note2 = notes.find(n => n.id === noteId);
+            if (note2) {
+            // Change the paragraph content to the description of the selected note
+            edit_id.value = note2.id;
+            edit_title.value = note2.title; // Set the paragraph text to the note's description
+            edit_desc.value = note2.desc;
+            edit_isImp.value = note2.isImp;
+
+            }
+        }
     </script>
-    <script
-      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
-      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
   </body>
 </html>
