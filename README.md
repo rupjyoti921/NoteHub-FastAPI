@@ -19,3 +19,12 @@ The Notes Management App is a simple web application built using FastAPI and Mon
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/NoteHub-FastAPI.git
+
+## API Endpoints
+- **POST /create**: Create a new note.
+- **POST /update**: Update an existing note.
+- **DELETE /delete**: Delete a note by ID.
+- **GET /**: Retrieve all notes.
+
+## License
+This project is licensed under the MIT License.
